@@ -3,25 +3,19 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
-/**
- * Base
- */
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
 
-/**
- * Sizes
- */
- const sizes = {
+// Sizes
+const sizes = {
   width: window.innerWidth,
   height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () => {
   // Update sizes
   sizes.width = window.innerWidth
   sizes.height = window.innerHeight
@@ -44,31 +38,53 @@ scene.add(camera)
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 
+// Sampler
+let vertices = null
+
 // Add GLTF Object
 const loader = new GLTFLoader()
 
 loader.load(
-  './assets/Logo.gltf',
+  './assets/LogoMerged.gltf',
+
+  // called when the resource is loaded
   (gltf) => {
-    scene.add(gltf.scene)
-  },
-  undefined,
-  (error) => {
-    console.error(error)
+
+    gltf.scene.traverse((child) => {
+
+      if (child.name === 'LogoMergedRemesh') {
+
+        // Get vertices
+        vertices = child.geometry.attributes.position.array  
+
+        //Create a for loop to add a sprite for each vertex
+        for (let i = 0; i < vertices.length; i += 300) {
+
+          const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: new THREE.TextureLoader().load('./assets/dotTexture.png'),
+            color: 0xffffff,
+            transparent: false,
+            opacity: 1
+          }))
+
+          sprite.position.set(vertices[i], vertices[i + 1], vertices[i + 2])
+          sprite.scale.set(0.005, 0.005, 0.005)
+          scene.add(sprite)
+        }
+      }  
+
+    })
   }
 )
 
 
-/**
-* Add lights
-*/
+// Add lights
 const light = new THREE.PointLight(0xffffff, 1, 100)
 light.position.set(5, 7, 10)
 scene.add(light)
 
-/**
-* Renderer
-*/
+
+// Renderer
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
   antialias: true,
@@ -79,14 +95,12 @@ renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1;
 
-/**
-* Animate
-*/
+
+// Animate 
 const clock = new THREE.Clock()
 let lastElapsedTime = 0
 
-const tick = () =>
-{
+const tick = () => {
   const elapsedTime = clock.getElapsedTime()
   const deltaTime = elapsedTime - lastElapsedTime
   lastElapsedTime = elapsedTime
@@ -99,7 +113,6 @@ const tick = () =>
 
   // Render
   renderer.render(scene, camera)
-  
 
   // Call tick again on the next frame
   window.requestAnimationFrame(tick)
