@@ -6,7 +6,9 @@
 
 html,
 body
+
 {
+    background-color: black;
     overflow: hidden;
 }
 

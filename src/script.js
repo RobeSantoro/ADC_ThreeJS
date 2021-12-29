@@ -2,12 +2,7 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-
-// Canvas
-const canvas = document.querySelector('canvas.webgl')
-
-// Scene
-const scene = new THREE.Scene()
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 
 // Sizes
  const sizes = {
@@ -30,6 +25,12 @@ window.addEventListener('resize', () =>
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
+// Canvas
+const canvas = document.querySelector('canvas.webgl')
+
+// Scene
+const scene = new THREE.Scene()
+
 // Base camera
 const camera = new THREE.PerspectiveCamera(50, sizes.width / sizes.height, 0.1, 100)
 camera.position.z = 10
@@ -38,6 +39,13 @@ scene.add(camera)
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
+ 
+// Environment
+const envMap = new THREE.CubeTextureLoader()
+  .setPath('./assets/textures/cube/')
+  .load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg'])
+
+//scene.background = envMap
 
 // Add GLTF Object
 const loader = new GLTFLoader()
@@ -45,6 +53,17 @@ const loader = new GLTFLoader()
 loader.load(
   './assets/LogoMergedClean.gltf',
   (gltf) => {
+
+    // Add environment map to the objects
+    gltf.scene.traverse(function (child) {
+      if (child.isMesh) {
+        child.material.envMap = envMap
+        child.material.envMapIntensity = 1
+        child.material.needsUpdate = true
+      }
+    })
+        
+    // Add model to the scene    
     scene.add(gltf.scene)
   },
   undefined,
