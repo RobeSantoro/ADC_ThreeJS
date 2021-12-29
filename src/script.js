@@ -3,6 +3,11 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
+// Import Statistic module
+import Stats from 'three/examples/jsm/libs/stats.module'
+const stats = Stats()
+document.body.appendChild(stats.dom)
+
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
@@ -40,6 +45,8 @@ controls.enableDamping = true
 
 // Sampler
 let vertices = null
+let vertexColors = null
+let verticesGroup = null
 
 // Add GLTF Object
 const loader = new GLTFLoader()
@@ -55,22 +62,36 @@ loader.load(
       if (child.name === 'LogoMergedRemesh') {
 
         // Get vertices
-        vertices = child.geometry.attributes.position.array  
+        vertices = child.geometry.attributes.position.array
 
+        // Get colors
+        vertexColors = child.geometry.attributes.color.array
+        
+        // Create vertices group
+        verticesGroup = new THREE.Group()
+
+        
         //Create a for loop to add a sprite for each vertex
         for (let i = 0; i < vertices.length; i += 300) {
+          // Create a Group as a container for the sprites
 
           const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-            map: new THREE.TextureLoader().load('./assets/dotTexture.png'),
-            color: 0xffffff,
-            transparent: false,
-            opacity: 1
+            /* map: new THREE.TextureLoader().load('assets/dotTexture.png'), */
+            color: vertexColors[i],
+            transparent: true,
+            opacity: 1,
+            depthWrite: false, 
+            depthTest: false,
+            blending: THREE.AdditiveBlending
           }))
 
           sprite.position.set(vertices[i], vertices[i + 1], vertices[i + 2])
           sprite.scale.set(0.005, 0.005, 0.005)
-          scene.add(sprite)
-        }
+          verticesGroup.add(sprite)          
+        }       
+         
+        
+        scene.add(verticesGroup)
       }  
 
     })
@@ -108,11 +129,18 @@ const tick = () => {
   //FPS
   //console.log(Math.round(1/deltaTime));
 
+  // 
+  
+
+
   // Update controls
   controls.update()
 
   // Render
   renderer.render(scene, camera)
+
+  // Stats update
+  stats.update()
 
   // Call tick again on the next frame
   window.requestAnimationFrame(tick)
