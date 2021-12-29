@@ -3,18 +3,13 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
-/**
- * Base
- */
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
 
-/**
- * Sizes
- */
+// Sizes
  const sizes = {
   width: window.innerWidth,
   height: window.innerHeight
@@ -37,7 +32,7 @@ window.addEventListener('resize', () =>
 
 // Base camera
 const camera = new THREE.PerspectiveCamera(50, sizes.width / sizes.height, 0.1, 100)
-camera.position.z = 3
+camera.position.z = 10
 scene.add(camera)
 
 // Controls
@@ -48,7 +43,7 @@ controls.enableDamping = true
 const loader = new GLTFLoader()
 
 loader.load(
-  './assets/Logo.gltf',
+  './assets/LogoMergedClean.gltf',
   (gltf) => {
     scene.add(gltf.scene)
   },
@@ -59,19 +54,16 @@ loader.load(
 )
 
 
-/**
-* Add lights
-*/
+// Add Lights
 const light = new THREE.PointLight(0xffffff, 1, 100)
 light.position.set(5, 7, 10)
 scene.add(light)
 
-/**
-* Renderer
-*/
+// Renderer 
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
   antialias: true,
+  alpha: true
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -79,9 +71,7 @@ renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1;
 
-/**
-* Animate
-*/
+// Animate
 const clock = new THREE.Clock()
 let lastElapsedTime = 0
 
