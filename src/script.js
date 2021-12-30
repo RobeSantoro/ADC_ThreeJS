@@ -45,8 +45,7 @@ controls.enableDamping = true
 
 // Sampler
 let vertices = null
-let vertexColors = null
-let verticesGroup = null
+let Points = null
 
 // Add GLTF Object
 const loader = new GLTFLoader()
@@ -61,43 +60,21 @@ loader.load(
 
       if (child.name === 'LogoMergedRemesh') {
 
-        // Get vertices
+        child.material = new THREE.PointsMaterial({
+          size: 0.1,
+          vertexColors: THREE.VertexColors,
+          sizeAttenuation: false
+        })
+
         vertices = child.geometry.attributes.position.array
-
-        // Get colors
-        vertexColors = child.geometry.attributes.color.array
-        
-        // Create vertices group
-        verticesGroup = new THREE.Group()
-
-        
-        //Create a for loop to add a sprite for each vertex
-        for (let i = 0; i < vertices.length; i += 300) {
-          // Create a Group as a container for the sprites
-
-          const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-            /* map: new THREE.TextureLoader().load('assets/dotTexture.png'), */
-            color: vertexColors[i],
-            transparent: true,
-            opacity: 1,
-            depthWrite: false, 
-            depthTest: false,
-            blending: THREE.AdditiveBlending
-          }))
-
-          sprite.position.set(vertices[i], vertices[i + 1], vertices[i + 2])
-          sprite.scale.set(0.005, 0.005, 0.005)
-          verticesGroup.add(sprite)          
-        }       
-         
-        
-        scene.add(verticesGroup)
-      }  
+        Points = new THREE.Points(child.geometry, child.material)
+        scene.add(Points)
+      }
 
     })
+
   }
 )
-
 
 // Add lights
 const light = new THREE.PointLight(0xffffff, 1, 100)
@@ -130,7 +107,7 @@ const tick = () => {
   //console.log(Math.round(1/deltaTime));
 
   // 
-  
+
 
 
   // Update controls
