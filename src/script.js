@@ -77,6 +77,8 @@ loader.load(
 const light = new THREE.PointLight(0xffffff, 1, 100)
 light.position.set(5, 7, 10)
 scene.add(light)
+const ambientLight = new THREE.AmbientLight(0x172d68, 1)
+scene.add(ambientLight)
 
 // Renderer 
 const renderer = new THREE.WebGLRenderer({
@@ -89,6 +91,11 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1;
+renderer.setClearColor(0x172d68, 0)
+
+// FOG
+scene.fog = new THREE.Fog(0x172d68, 0.1, 50)
+
 
 // Animate
 const clock = new THREE.Clock()
@@ -102,7 +109,7 @@ const tick = () =>
 
   //FPS
   //console.log(Math.round(1/deltaTime));
-
+ 
   // Update controls
   controls.update()
 
